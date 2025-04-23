@@ -3,6 +3,7 @@ import numpy as np
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 import sys
+import random
 
 
 
@@ -37,6 +38,23 @@ def params_conds(sigma,S,w,n,k):
     print("Err: k is the lenght of w")
     return False 
   return True 
+
+def gen_rand_assortment(sigma,N,r1,r2):
+  # samples r1 elements from sigma and r2 from N (no duplicate)
+  A=[]
+  while len(A)<r1:
+    rand=random.choice(sigma)
+    if rand not in A:
+      A=A+[rand]
+  while len(A)<r1+r2:
+    rand=random.choice(N)
+    if rand not in A:
+      A=A+[rand]
+  return A
+
+
+
+
 
 
   

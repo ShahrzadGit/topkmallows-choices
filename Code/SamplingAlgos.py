@@ -32,7 +32,7 @@ S denotes a profile. It must be a list and a subset of sigma
 
 
 def Profile_probablity(S, sigma, n, k, p ,  w):
-# Algorithm 3
+# Algorithm 4
 # sigma is the center
 # n, k , p beta and w are topkGMM's parameters
 # w shows the weights of the elements sigma[1],sigma[2],..., sigma[k] and w_perp=w[0]
@@ -101,14 +101,14 @@ def Find_All_Profiles_Prob(sigma, n, k, p , beta, w):
   Dic_sub={}
   for S in profile_list:
     f_S=Profile_probablity(S, sigma, n, k, p ,  w)
-    print("f_S",S, f_S)
+  #  print("f_S",S, f_S)
     Z_S=Find_Z(S, sigma, n, k,   w,beta)
-    print("Z_S",S, Z_S)
+   # print("Z_S",S, Z_S)
     pr=np.exp(-beta*f_S)*Z_S
      
     Dic_pr[counter]=pr
     Dic_sub[counter]=S
-    print("Z and Pr",Z,pr)
+   # print("Z and Pr",Z,pr)
     Z=Z+pr
     counter=counter+1
   return Z,Dic_pr,Dic_sub
@@ -127,7 +127,7 @@ def PRIME(S, sigma, n, k,  beta, w):
     index_range=list(range(k-ell))
    # print("k-ell and index range", k-ell, index_range)
     cur_ind=ell -1
-    print("bag part is now sampled in tau", tau)
+    #print("bag part is now sampled in tau", tau)
     
     Z=0
     for j in range(ell):
@@ -159,7 +159,7 @@ def generate_sample(sigma, n, k,p,  beta, w, dic_pr, dic_sub,Z):
     #print("ind_range",ind_range)
     S_ind=random.choices(ind_range,probs)[0]
     S=dic_sub[S_ind]
-    print("S,S_ind", S,S_ind)
+   # print("S,S_ind", S,S_ind)
     tau=PRIME(S, sigma, n, k,  beta, w)
 
     return tau 

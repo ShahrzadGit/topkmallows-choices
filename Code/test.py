@@ -5,6 +5,9 @@ from SamplingAlgos import  Find_All_Profiles_Prob
 from SamplingAlgos import PRIME
 from SamplingAlgos import generate_sample
 from Aux_funcs import find_item_weight
+from LearningAlgos import LearnTopElement
+from CreateSyntheticData import Choice
+from CreateSyntheticData import CreateChoiceSamples
 
 
 #test files:
@@ -139,17 +142,35 @@ def test_gen_sample():
     w=[2,1,1,1]
     beta=1
     p=1
+    print("testing test_get_sample, param: sigma,",sigma, "n", n, "beta,", beta, "k", k  )
     Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
     for i in range(10):
         print("sample", i)
         tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)
         print("sample", i, ":",tau)
     beta=0.5
+    print("testing test_get_sample, param: sigma,",sigma, "n", n, "beta,", beta, "k", k  )
+
     Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
     for i in range(20):
         print("sample", i)
         tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)
         print("sample", i, ":",tau)
+
+def test_choice():
+    n=10
+    A=[1,3,6,7]
+    tau=[4,7,9,2]
+    c=Choice(A,tau,n)
+    print("choice of",tau, "from", A, "is:", c)
+    A=[1,3,6,7]
+    tau=[4,9,2]
+    c=Choice(A,tau,n)
+    print("choice of",tau, "from", A, "is:", c)
+    tau=[4,0,9,2]
+    c=Choice(A,tau,n)
+    print("choice of",tau, "from", A, "is:", c)
+
 
 
 
