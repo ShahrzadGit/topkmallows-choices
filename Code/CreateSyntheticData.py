@@ -8,8 +8,9 @@ from SamplingAlgos import generate_sample
 from Aux_funcs import find_item_weight
 from LearningAlgos import LearnTopElement
 import random
-import matplotlib.pyplot as plt
 import numpy as np
+import sys
+import time
 
 
 def TopAssElement(tau,A):
@@ -46,115 +47,107 @@ def Choice(A, tau,n):
 
 
 
-def CreateChoiceSamples(m, sigma, w, beta, n, k,p, A):
+def CreateChoiceSamples(m, sigma, w, beta, n, k,p, A,Dic_pr, Dic_sub,Z):
     # create m samples from a distibution diven the other parameters
     # m top-k samples are stored in T
     # choices w.r.t. A are stored in S
     T=[]
     S=[]
-
-    Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
+    
+    exc_time=[]
     for i in range(m):
+        start=time.time()
         tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)
+        end=time.time()
+        exc_time=exc_time+[end-start]
         T=T+[tau]
         S=S+[Choice(A,tau,n)]
-    return T,S
+    end=time.time()
+    exc_time_per_sample=np.mean(exc_time)
+    return T,S,  exc_time_per_sample
 
 
-def find_accuracy_learningtop(n,k,r,m,beta, p,num_runs):
+def find_accuracy_learningtop(n,k,w,r,m,beta, p,num_runs):
 
-
-
-   
     N=list(range(1,n+1))
-
     sigma=list(range(1,k+1))
-    w=[2]+([1]*(k))
-    print("parameters are: n",n, "sigma", sigma, "w", w )
+
+    # run the preprocessing step for sampling 
+    start=time.time()
+    Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
+    end=time.time()
+    preprocessing_time=end-start
+    print("preprocessing time for sampling:",  preprocessing_time )
+    
+    #print("parameters are: n",n, "sigma", sigma, "w", w, "beta", beta )
     
     Acclist=[]
+    sample_exc_time=[]
     for j in range(10):
         acc=0
         for i in range(num_runs):
         # we sample the assortment such that: k/2 elements are from sigma, and the rest can be anywhere between 1...n
             s=int(r/2)+1
             A=gen_rand_assortment(sigma,N,s,r-s)
-            print("sampled assortment:",A)
+          #  print("sampled assortment:",A)
         # we now create m samples and store them list S (top-k samples), and T (choices)
-            T,S=CreateChoiceSamples(m, sigma, w, beta, n, k,p, A)
+            T,S, exc_time_per_sample=CreateChoiceSamples(m, sigma, w, beta, n, k,p, A,Dic_pr, Dic_sub,Z)
+            sample_exc_time= sample_exc_time+[exc_time_per_sample]
        # print("T",T)
        # print("S",S)
 
         # learn the top element:
             x=LearnTopElement(A,S)
             y=TopAssElement(sigma,A)
-            print("learned: ",x," real: ",y)
+         #   print("learned: ",x," real: ",y)
             if x==y:
                 acc=acc+1
             
           
         Acclist=Acclist+[acc/num_runs]
-        print("Acclist",Acclist)
+    print("amortized time for sample size ", m, "is: ", np.mean(sample_exc_time))
+    #print("Acclist",Acclist)
     return np.mean(Acclist),np.std(Acclist)
 
 
 
 
-def exp1(n,k,r,beta, p):
+def exp1(n,k,w,r,beta, p):
     num_runs=10
     Accuracylistmean=[]
     Accuracyliststd=[]
     for i in range(1,51):
         m=i*10
-        accmean,accstd=find_accuracy_learningtop(n,k,r,m,beta, p,num_runs)
+        accmean,accstd=find_accuracy_learningtop(n,k,w,r,m,beta, p,num_runs)
         Accuracylistmean=Accuracylistmean+[accmean]
         Accuracyliststd=Accuracyliststd+[accstd]
     return Accuracylistmean,Accuracyliststd
 
-n=100
+n=1000
 k=10
 r=8
-beta=0.4
 p=0.5
-Ly,Lv=exp1(n,k,r,beta, p)
+w=[2]+([1]*(k))
+
+#plots with variance:
 
 
-x = np.array(range(10, 510,10))
-y_beta4 = np.array(Ly)
-v= np.array(Lv)
-plt.errorbar(x, y_beta4, v, fmt='o-', capsize=5,color="blue",label="beta=0.4")
 
-beta=0.6
-Ly,Lv=exp1(n,k,r,beta, p)
-y_beta6 = np.array(Ly)
-v= np.array(Lv)
-plt.errorbar(x, y_beta6, v, fmt='o-', capsize=5,color="red",label="beta=0.6")
+outputfile_name= f"/Users/sh1678/Dropbox/Research/Mallows/topkmallows-choices/Logs/outputfile:n{n}_k{k}_r{r}_p{p}.txt"
 
-beta=0.8
-Ly,Lv=exp1(n,k,r,beta, p)
-y_beta8 = np.array(Ly)
-v= np.array(Lv)
-plt.errorbar(x, y_beta8, v, fmt='o-', capsize=5, color="orange",label="beta=0.8")
 
-beta=1
-Ly,Lv=exp1(n,k,r,beta, p)
-y_beta1 = np.array(Ly)
-v= np.array(Lv)
-plt.errorbar(x, y_beta1, v, fmt='o-', capsize=5,color="green",label="beta=1")
 
-beta=1.2
-Ly,Lv=exp1(n,k,r,beta, p)
-y_beta12 = np.array(Ly)
-v= np.array(Lv)
-plt.errorbar(x, y_beta1, v, fmt='o-', capsize=5,color="brown",label="beta=1.2")
+sys.stdout = open(outputfile_name, 'w')
 
-plt.xlabel("number of samples")
-plt.ylabel("accuracy")
-plt.legend()
 
-file_path = f"/Users/sh1678/Dropbox/Research/Mallows/topkmallows-choices/Plots/beta: 0.4-1.2_n{n}_k{k}_r{r}_p{p}.png"
 
-plt.savefig(file_path)
+for i in range(2,13):
+    beta=0.1*i
+    Ly,Lv=exp1(n,k,w,r,beta, p)
+    print("beta = ", beta, "\n")
+    print("mean of accuracies:", Ly,"\n")
+    print("variance of accuracies:", Lv,"\n")
+
 
 
 

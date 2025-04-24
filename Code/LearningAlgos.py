@@ -45,7 +45,7 @@ def LearnTopElement(A,S):
             if Y[i][j]>1/(2*(r+1)):
                 count=count+1
         T[i]=count
-    print("all counts:",T)
+   # print("all counts:",T)
 
     if T.count(r)==1:
         return A[T.index(r)]
