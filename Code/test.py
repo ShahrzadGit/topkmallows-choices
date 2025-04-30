@@ -6,8 +6,12 @@ from SamplingAlgos import PRIME
 from SamplingAlgos import generate_sample
 from Aux_funcs import find_item_weight
 from LearningAlgos import LearnTopElement
+from Aux_funcs import compare
+from Aux_funcs import distance
+from Aux_funcs import make_list_dic
 from CreateSyntheticData import Choice
 from CreateSyntheticData import CreateChoiceSamples
+
 
 
 #test files:
@@ -156,6 +160,30 @@ def test_gen_sample():
         print("sample", i)
         tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)
         print("sample", i, ":",tau)
+    sigma=[5,2,7]
+
+    print("testing test_get_sample, param: sigma,",sigma, "n", n, "beta,", beta, "k", k  )
+
+    Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
+    for i in range(20):
+        print("sample", i)
+        tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)
+        print("sample", i, ":",tau)    
+
+    n=20
+    k=10
+    p=0.5
+    w=[2]+([1]*(k))
+    sigma=[10,16,2,3,8,5,6,9,7,12]
+    beta=1
+    print("sigma",sigma)
+    Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
+    for i in range(20):
+        print("sample", i)
+        tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)
+        print("sample", i, ":",tau)
+
+
 
 def test_choice():
     n=10
@@ -171,8 +199,25 @@ def test_choice():
     c=Choice(A,tau,n)
     print("choice of",tau, "from", A, "is:", c)
 
+def test_distance():
+    p=0.5
+    tau=make_list_dic([1,2,3])
+    sigma=make_list_dic([2,1,3])
+
+    print("the distance between", tau, "and", sigma, "is", distance(tau,sigma,p))
+    tau=make_list_dic([2,3,1])
+    sigma=make_list_dic([2,1,3,4,6,5])
+    print("the distance between", tau, "and", sigma, "is", distance(tau,sigma,p))
+    tau=make_list_dic([2,3,6])
+    sigma=make_list_dic([2,5,1])
+    print("the distance between", tau, "and", sigma, "is", distance(tau,sigma,p))
+    tau=make_list_dic([1,2,3,4])
+    sigma=make_list_dic([4,3,2,1])
+    print("the distance between", tau, "and", sigma, "is", distance(tau,sigma,p))
 
 
 
 
-test_gen_sample()
+
+
+

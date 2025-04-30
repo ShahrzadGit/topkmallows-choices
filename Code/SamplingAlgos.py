@@ -36,11 +36,12 @@ def Profile_probablity(S, sigma, n, k, p ,  w):
 # sigma is the center
 # n, k , p beta and w are topkGMM's parameters
 # w shows the weights of the elements sigma[1],sigma[2],..., sigma[k] and w_perp=w[0]
-# S includes a subset of indices from 1...k, and shows the profile which is sigma(S[1]), sigma(S[2]), \dots sigma(S[\ell])
+# S includes a subset of sigma
     if (not params_conds(sigma,S,w,n,k)):
         print("wrong parameters")
         return None
     else:
+      #  print("profile probablity of ",S)
   
         ell=len(S)
         Q_S= (k-ell)*(k-ell-1)/2
@@ -48,18 +49,20 @@ def Profile_probablity(S, sigma, n, k, p ,  w):
         y=0
         f_S=w[0]*p*Q_S
         for j in range(k, 0, -1):
-            #print("j",j)
+           # print("j",j)
+          #  print("sigma j", sigma[j-1])
             I_sigmaj=k-ell+x
             P_sigmaj=n-2*k+ell+y
            
-            if(j in S):
+            if(sigma[j-1] in S):
                 x=x+1
+               
             else:
                 y=y+1
-                #print("I_sigmaj", I_sigmaj, "P_sigmaj", P_sigmaj)
-                #print("weight of the item:", sigma[j-1],"is", w[j])
-                f_S=f_S+find_item_weight(sigma,w,j)*(I_sigmaj+p*P_sigmaj)
-                #print("weighted sum of inversions:", I_sigmaj+p*P_sigmaj)
+              #  print("I_sigmaj", I_sigmaj, "P_sigmaj", P_sigmaj)
+              #  print("weight of the item:", sigma[j-1],"is", w[j])
+                f_S=f_S+find_item_weight(sigma,w,sigma[j-1])*(I_sigmaj+p*P_sigmaj)
+               # print("weighted sum of inversions:", I_sigmaj+p*P_sigmaj)
         return f_S
 
 

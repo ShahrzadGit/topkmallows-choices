@@ -7,6 +7,10 @@ from SamplingAlgos import PRIME
 from SamplingAlgos import generate_sample
 from Aux_funcs import find_item_weight
 from LearningAlgos import LearnTopElement
+from LearningAlgos import Choice
+from LearningAlgos import BuCchoi
+from Aux_funcs import distance
+from Aux_funcs import make_list_dic
 import random
 import numpy as np
 import sys
@@ -20,27 +24,18 @@ def TopAssElement(tau,A):
     return None 
 
 
-def Choice(A, tau,n):
 
-    N=list(range(1,n+1))
-    if ( not set(A)<= set(N)):
-        print("A must be subset of 1,2,..n")
-        return None
-    Anull=A+[0]
-    Nnull=N+[0]
-    if ( not set(tau)<= set(Nnull)):
-        print("tau must be subset of 0,1,2,..n")
-        return None
-    k=len(tau)
-    for i in range(k):
-        if tau[i] in Anull:
-            return tau[i]
-      
+def CreateSamples(m, sigma, w, beta, n, k,p, Dic_pr, Dic_sub,Z):
+    # create m samples from a distibution diven the other parameters
+    # m top-k samples are stored in T
     
-   
-    c=random.choice(Anull)
-    return c
-
+    T=[] 
+    for i in range(m):       
+        tau=generate_sample(sigma, n, k,p,  beta, w, Dic_pr, Dic_sub,Z)   
+        T=T+[tau]
+     
+    
+    return T
     
 
 
@@ -109,6 +104,24 @@ def find_accuracy_learningtop(n,k,w,r,m,beta, p,num_runs):
     #print("Acclist",Acclist)
     return np.mean(Acclist),np.std(Acclist)
 
+def Find_Bucchoi_Accuracy(n,sigma,w,m,beta, p,num_runs):
+    real_center=make_list_dic(sigma)
+    N=list(range(1,n+1))
+    if not set(sigma)<=set(N):
+        print("sigma should be subset of 1..n")
+        return None
+    Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
+    sigmalist=[]
+    distancelist=[]
+    for j in range(num_runs):
+        T=CreateSamples(m, sigma, w, beta, n, k,p, Dic_pr, Dic_sub,Z)
+        #print("round,",j,"samples:",T)
+        learned_center=BuCchoi(N,T)
+        sigmalist=sigmalist+[learned_center]
+        distancelist=distancelist+[distance(learned_center,real_center,p)]
+    return sigmalist,distancelist
+
+
 
 
 
@@ -123,30 +136,60 @@ def exp1(n,k,w,r,beta, p):
         Accuracyliststd=Accuracyliststd+[accstd]
     return Accuracylistmean,Accuracyliststd
 
+
+def exp2(n,sigma,w,beta, p):
+    num_runs=10
+    distancelistmean=[]
+    distanceliststd=[]
+   
+    sample_sizes=[i*20 for i in range(1,21) ]
+    for m in sample_sizes:
+        
+        sigmalist,distancelist=Find_Bucchoi_Accuracy(n,sigma,w,m,beta, p,num_runs)
+        distancelistmean=distancelistmean+[np.mean(distancelist)]
+        distanceliststd=distanceliststd+[np.std(distancelist)]
+
+    #print("results:",sigmalist,distancelist)
+    return distancelistmean, distanceliststd
+
+
+
+
+
 n=1000
 k=10
-r=8
+r=k-2
 p=0.5
 w=[2]+([1]*(k))
-
+sigma=[1,2,3,4,5,6,7,8,9,10]
+sample_sizes=[i*20 for i in range(1,21) ]
 #plots with variance:
 
 
 
-outputfile_name= f"/Users/sh1678/Dropbox/Research/Mallows/topkmallows-choices/Logs/outputfile:n{n}_k{k}_r{r}_p{p}.txt"
+outputfile_name= f"/Users/sh1678/Dropbox/Research/Mallows/topkmallows-choices/Logs/learncenter:n{n}_k{k}_r{r}_p{p}.txt"
 
 
 
 sys.stdout = open(outputfile_name, 'w')
 
 
+print("#sigma:",sigma)
+print("#sample size array:",sample_sizes)
 
-for i in range(2,13):
-    beta=0.1*i
-    Ly,Lv=exp1(n,k,w,r,beta, p)
-    print("beta = ", beta, "\n")
-    print("mean of accuracies:", Ly,"\n")
-    print("variance of accuracies:", Lv,"\n")
+for i in [2,3,4,5,6]:
+    beta=0.2*i
+    Ld,Lv=exp2(n,sigma,w,beta, p)
+    print("#beta = ", beta, "\n")
+    print("#mean of distances:\n", "Ld=",Ld,"\n")
+    print("#variance of distances:\n","Lv=", Lv,"\n")
+
+
+
+
+
+
+
 
 
 
