@@ -156,12 +156,12 @@ def exp2(n,sigma,w,beta, p):
 
 
 
-n=1000
-k=10
+n=500
+k=8
 r=k-2
 p=0.5
 w=[2]+([1]*(k))
-sigma=[1,2,3,4,5,6,7,8,9,10]
+sigma=[1,2,3,4,5,6,7,8]
 sample_sizes=[i*20 for i in range(1,21) ]
 #plots with variance:
 
@@ -173,7 +173,7 @@ outputfile_name= f"/Users/sh1678/Dropbox/Research/Mallows/topkmallows-choices/Lo
 
 sys.stdout = open(outputfile_name, 'w')
 
-
+print("#n=",n,"k=",k,"p=",p)
 print("#sigma:",sigma)
 print("#sample size array:",sample_sizes)
 
@@ -181,7 +181,7 @@ for i in [2,3,4,5,6]:
     beta=0.2*i
     Ld,Lv=exp2(n,sigma,w,beta, p)
     print("#beta = ", beta, "\n")
-    print("#mean of distances:\n", "Ld=",Ld,"\n")
+    print("#mean of distances:\n","Ld=",Ld,"\n")
     print("#variance of distances:\n","Lv=", Lv,"\n")
 
 
