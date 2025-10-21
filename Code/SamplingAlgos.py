@@ -149,11 +149,49 @@ def PRIME(S, sigma, n, k,  beta, w):
        
     return tau
 
+def PRIMPOS(S, sigma, n, k,  beta, w,i,j,q):
+
+    """
+    This is a subroutine that will get used in DypChip
+    when the qth item from S is getting inserted in PRIM, it calculates the probablity of S[q] being inserted in a specific position. 
+
+    """
+
+    if (not params_conds(sigma,S,w,n,k)):
+        print("wrong parameters")
+        return None
+  
+
+    # first sort S w.r.t. sigma:
+   # print("calling primpos with i", i, "j", j)
+    ell=len(S)
+    L=[]
+    s=S[q]
+    w_s=find_item_weight(sigma,w,s)
+
+    # when inserting qth element from S we already have q+k-ell elements sampled in the top-k thus 0,1,..q+k-ell are the possible number of inversions 
+    for it in range(q+k-ell+1):
+        L=L+[np.exp(-beta*w_s*it)]
+   
+    Z = np.sum(L)
+   # print("L prim probs", L/Z)
+    if j==None:
+       # print("slice of L",i,j,L[i:]/Z)
+        ret_val=np.sum(L[i:])/Z
+    else: 
+       # print("slice of L",i,j,L[i:j]/Z)
+        ret_val=np.sum(L[i:j])/Z
+    return ret_val
+
+    
+
+
+
 
 
 
 def generate_sample(sigma, n, k,p,  beta, w, dic_pr, dic_sub,Z):
- #    Z,Dic_pr,Dic_sub=(sigma, n, k, p , beta, w)
+ #    Z,Dic_pr,Dic_sub=Find_All_Profiles_Prob(sigma, n, k, p , beta, w)
     if (not params_conds):
         return None
     probs=list(dic_pr.values())
