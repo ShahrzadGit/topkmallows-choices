@@ -20,3 +20,7 @@ Furthermore, through extensive experiments on synthetic data and real world data
 we demonstrate the scalability and accuracy of our proposed methods and we
 compare the predictive power of Mallows model for top-k lists compared to the
 simpler Multinomial Logit model.
+
+
+* A python implementation of algorithms for sampling, learning and calculation of choice probablities can be found in /Code/
+
