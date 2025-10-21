@@ -23,4 +23,5 @@ simpler Multinomial Logit model.
 
 
 * A python implementation of algorithms for sampling, learning and calculation of choice probablities can be found in /Code/
+* Code was written in Python 3.9.6
 
