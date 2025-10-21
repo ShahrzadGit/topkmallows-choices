@@ -105,6 +105,12 @@ def distance(dic_tau,dic_sigma,p):
 
   return inv+invp*p
 
+def printDP(L):
+  n=len(L)
+  for i in range(n):
+    print("array number", i)
+    print(L[i])
+
 
 
       
